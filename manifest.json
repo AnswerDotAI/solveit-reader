@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Solveit Reader",
+  "version": "1.0",
+  "description": "Import any webpage into Solveit for reading and annotation",
+  "permissions": ["activeTab", "storage", "cookies"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      width: 320px;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+    }
+    h2 { margin: 0 0 12px 0; font-size: 16px; }
+    label { display: block; margin-bottom: 4px; font-weight: 500; }
+    input { 
+      width: 100%; 
+      padding: 8px; 
+      margin-bottom: 12px; 
+      border: 1px solid #ccc; 
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover { background: #1d4ed8; }
+    button:disabled { background: #9ca3af; cursor: not-allowed; }
+    #status { margin-top: 12px; font-size: 13px; color: #666; }
+    #status.error { color: #dc2626; }
+    #status.success { color: #16a34a; }
+  </style>
+</head>
+<body>
+  <h2>📖 Solveit Reader</h2>
+  
+  <label for="instance">Solveit Instance URL</label>
+  <input type="text" id="instance" placeholder="http://localhost:6001">
+  
+  <label for="folder">Folder</label>
+  <input type="text" id="folder" placeholder="readings">
+  
+  <button id="import">Import to Solveit</button>
+  
+  <div id="status"></div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
