@@ -74,7 +74,7 @@ async function importPage() {
     if (!createResp.ok) throw new Error(`Failed to create dialog: ${createResp.status}`);
     
     // Add code cell that will fetch and add the URL content
-    const codeContent = `url2note('${pageUrl}')`;
+    const codeContent = `from dialoghelper.core import url2note\n\nurl2note('${pageUrl}')`;
     
     const addResp = await fetch(`${instance}/add_relative_`, {
       method: 'POST',
