@@ -1,13 +1,24 @@
 # Solveit Reader
 
-A Chrome extension that imports any webpage into Solveit for reading and annotation.
+A Chrome and Firefox extension that imports any webpage into Solveit for reading and annotation.
 
 ## Installation
+
+### Chrome
 
 1. Go to `chrome://extensions/` in Chrome
 2. Enable "Developer mode" (toggle in top right)
 3. Click "Load unpacked"
 4. Select the `solveit-reader` folder
+
+### Firefox
+
+1. Go to `about:debugging` in Firefox
+2. Click "This Firefox" in the left sidebar
+3. Click "Load Temporary Add-on..."
+4. Select the `manifest.json` file from the `solveit-reader` folder
+
+**Note**: In Firefox, the extension is temporary and will be removed when you restart the browser. You'll need to reload it each session, or use Firefox Developer Edition/Nightly for persistent unsigned extensions.
 
 ## Usage
 
@@ -20,7 +31,7 @@ A Chrome extension that imports any webpage into Solveit for reading and annotat
 
 The extension will:
 - Create a new dialog named `{folder}/{sanitized-page-title}`
-- Add a code cell with `url2note('{page-url}')`
+- Add a code cell with `from dialoghelper import url2note` and `url2note('{page-url}')`
 - Auto-run the code to fetch the page content
 - Open the new dialog in a new tab
 
@@ -29,14 +40,14 @@ The extension will:
 1. **Dialog Creation**: POSTs to `/create_dialog_` with a sanitized version of the page title
 2. **Content Setup**: Adds a code cell containing `url2note('...')` via `/add_relative_`
 3. **Auto-execution**: Queues the code cell to run via `/add_runq_`
-4. **Authentication**: Uses Chrome's cookies API to include session cookies for authenticated remote instances
+4. **Authentication**: Uses the browser's cookies API to include session cookies for authenticated remote instances
 
 ## Settings
 
-Settings are saved persistently using Chrome's sync storage, so your instance URL and folder preferences carry across browser sessions.
+Settings are saved persistently using the browser's sync storage, so your instance URL and folder preferences carry across browser sessions.
 
 ## Requirements
 
-- Chrome browser
+- Chrome or Firefox browser
 - A running Solveit instance
 - `dialoghelper` with `url2note` available in the Solveit environment
