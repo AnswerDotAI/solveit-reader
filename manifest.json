@@ -1,16 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Solveit Reader",
-  "version": "1.0",
+  "version": "2.0",
   "description": "Import any webpage into Solveit for reading and annotation",
-  "permissions": [
-    "activeTab",
-    "storage",
-    "cookies"
-  ],
-  "host_permissions": [
-    "<all_urls>"
-  ],
+  "permissions": ["activeTab", "storage", "cookies", "scripting"],
+  "host_permissions": ["<all_urls>"],
   "action": {
     "default_popup": "popup.html"
   },
@@ -18,5 +12,9 @@
     "gecko": {
       "id": "solveit-reader@answer.ai"
     }
-  }
+  },
+  "web_accessible_resources": [{
+    "resources": ["turndown.js", "turndown-plugin-gfm.js"],
+    "matches": ["<all_urls>"]
+  }]
 }
