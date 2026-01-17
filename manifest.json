@@ -8,6 +8,11 @@
   "action": {
     "default_popup": "popup.html"
   },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "solveit-reader@answer.ai"
+    }
+  },
   "web_accessible_resources": [{
     "resources": ["turndown.js", "turndown-plugin-gfm.js"],
     "matches": ["<all_urls>"]

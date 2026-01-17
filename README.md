@@ -1,6 +1,6 @@
 # Solveit Reader
 
-A Chrome extension that imports any webpage into Solveit for reading and annotation.
+A Chrome and Firefox extension that imports any webpage into Solveit for reading and annotation.
 
 ## Features
 
@@ -12,10 +12,21 @@ A Chrome extension that imports any webpage into Solveit for reading and annotat
 
 ## Installation
 
+### Chrome
+
 1. Go to `chrome://extensions/`
 2. Enable "Developer mode" (toggle in top right)
 3. Click "Load unpacked"
 4. Select the `solveit-reader` folder
+
+### Firefox
+
+1. Go to `about:debugging` in Firefox
+2. Click "This Firefox" in the left sidebar
+3. Click "Load Temporary Add-on..."
+4. Select the `manifest.json` file from the `solveit-reader` folder
+
+**Note**: In Firefox, the extension is temporary and will be removed when you restart the browser. You'll need to reload it each session, or use Firefox Developer Edition/Nightly for persistent unsigned extensions.
 
 ## Usage
 
@@ -42,6 +53,7 @@ The extension will:
 
 ## Files
 
+Settings are saved persistently using the browser's sync storage, so your instance URL and folder preferences carry across browser sessions.
 ```
 solveit-reader/
 ├── manifest.json           # Extension config
@@ -56,7 +68,7 @@ solveit-reader/
 
 ## Requirements
 
-- Chrome browser
+- Chrome or Firefox browser
 - A running Solveit instance
 
 ## Changelog
