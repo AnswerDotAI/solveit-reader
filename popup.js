@@ -7,6 +7,13 @@ async function load() {
   const s = await chrome.storage.sync.get({instance:'', folder:'readings'})
   $('instance').value = s.instance
   $('folder').value = s.folder
+  
+  // Add chat button handler
+  $('chat').addEventListener('click', async () => {
+    await save()
+    chrome.sidePanel.open({windowId: (await chrome.windows.getCurrent()).id})
+    window.close()
+  })
 }
 
 async function save() {

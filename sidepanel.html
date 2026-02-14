@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Solveit Chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: #f5f5f5;
+    }
+    
+    #header {
+      padding: 12px 16px;
+      background: #2d3748;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    #header .status {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-left: auto;
+    }
+    
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .message {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    
+    .message.user {
+      align-self: flex-end;
+      background: #4a5568;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    
+    .message.assistant {
+      align-self: flex-start;
+      background: white;
+      color: #1a202c;
+      border: 1px solid #e2e8f0;
+      border-bottom-left-radius: 4px;
+    }
+    
+    .message.system {
+      align-self: center;
+      background: #edf2f7;
+      color: #718096;
+      font-size: 12px;
+      padding: 6px 12px;
+    }
+    
+    .message.error {
+      background: #fed7d7;
+      color: #c53030;
+    }
+    
+    #typing {
+      display: none;
+      align-self: flex-start;
+      padding: 10px 14px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      color: #718096;
+      font-size: 13px;
+    }
+    
+    #typing.show { display: block; }
+    
+    #input-area {
+      padding: 12px 16px;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      gap: 8px;
+    }
+    
+    #input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      resize: none;
+      font-family: inherit;
+      max-height: 120px;
+    }
+    
+    #input:focus {
+      outline: none;
+      border-color: #4a5568;
+    }
+    
+    #send {
+      padding: 10px 16px;
+      background: #4a5568;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    #send:hover { background: #2d3748; }
+    #send:disabled { background: #a0aec0; cursor: not-allowed; }
+    
+    #init-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      color: #4a5568;
+    }
+    
+    #init-screen h2 { margin-bottom: 8px; }
+    #init-screen p { margin-bottom: 16px; font-size: 14px; }
+    
+    #init-btn {
+      padding: 12px 24px;
+      background: #4a5568;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    #init-btn:hover { background: #2d3748; }
+    
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div id="header">
+    <span>💬 Solveit Chat</span>
+    <span id="status" class="status"></span>
+  </div>
+  
+  <div id="init-screen">
+    <h2>Chat with this page</h2>
+    <p>Import the current page and start a conversation with Solveit AI.</p>
+    <button id="init-btn">Start Chat</button>
+  </div>
+  
+  <div id="messages" class="hidden"></div>
+  <div id="typing">Thinking...</div>
+  
+  <div id="input-area" class="hidden">
+    <textarea id="input" placeholder="Ask about this page..." rows="1"></textarea>
+    <button id="send">Send</button>
+  </div>
+  
+  <script src="api.js"></script>
+  <script src="sidepanel.js"></script>
+</body>
+</html>
