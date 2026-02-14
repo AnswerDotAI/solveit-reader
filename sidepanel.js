@@ -21,15 +21,16 @@ async function getCurrentTab() {
 
 // Get page content as markdown via content script
 async function getPageMarkdown(tabId) {
+  // Inject the scripts
   await chrome.scripting.executeScript({
     target: {tabId},
-    files: ['turndown.js', 'turndown-plugin-gfm.js']
+    files: ['turndown.js', 'turndown-plugin-gfm.js', 'content.js']
   });
-  const [{result}] = await chrome.scripting.executeScript({
-    target: {tabId},
-    files: ['content.js']
-  });
-  return result;
+  
+  // Request conversion via message passing
+  const result = await chrome.tabs.sendMessage(tabId, {action: 'convertPage'});
+  if (!result.success) throw new Error(result.error || 'Failed to convert page');
+  return result.data.markdown;
 }
 
 // Display a message in the chat
