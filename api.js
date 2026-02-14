@@ -1,5 +1,8 @@
 // Shared API module for Solveit interaction
 const api = {
+  // Strip trailing slash from instance URL
+  cleanUrl(instance) { return instance.replace(/\/+$/, ''); },
+
   async post(url, body, cookies) {
     const res = await fetch(url, {
       method: 'POST',
@@ -15,18 +18,18 @@ const api = {
   },
 
   async createDialog(instance, name, cookies) {
-    return this.post(`${instance}/create_dialog_`, {name, api: 'true'}, cookies);
+    return this.post(`${this.cleanUrl(instance)}/create_dialog_`, {name, api: 'true'}, cookies);
   },
 
   async dialogExists(instance, name, cookies) {
     try {
-      const res = await this.post(`${instance}/curr_dialog_`, {dlg_name: name}, cookies);
+      const res = await this.post(`${this.cleanUrl(instance)}/curr_dialog_`, {dlg_name: name}, cookies);
       return res && !res.error;
     } catch { return false; }
   },
 
   async addMessage(instance, dlgName, content, msgType, cookies, placement='at_end') {
-    return this.post(`${instance}/add_relative_`, {
+    return this.post(`${this.cleanUrl(instance)}/add_relative_`, {
       dlg_name: dlgName,
       content,
       msg_type: msgType,
@@ -35,7 +38,7 @@ const api = {
   },
 
   async readMessage(instance, dlgName, msgId, cookies) {
-    return this.post(`${instance}/read_msg_`, {
+    return this.post(`${this.cleanUrl(instance)}/read_msg_`, {
       dlg_name: dlgName,
       id_: msgId,
       n: 0,
@@ -45,7 +48,7 @@ const api = {
 
   async execMessage(instance, dlgName, msgId, cookies, timeout=120000, interval=500) {
     // Add to run queue
-    await this.post(`${instance}/add_runq_`, {
+    await this.post(`${this.cleanUrl(instance)}/add_runq_`, {
       dlg_name: dlgName,
       id_: msgId,
       api: 'true'
@@ -62,6 +65,6 @@ const api = {
   },
 
   async getMessages(instance, dlgName, cookies) {
-    return this.post(`${instance}/find_msgs_`, {dlg_name: dlgName}, cookies);
+    return this.post(`${this.cleanUrl(instance)}/find_msgs_`, {dlg_name: dlgName}, cookies);
   }
 };
