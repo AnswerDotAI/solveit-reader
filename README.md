@@ -22,7 +22,7 @@ A Chrome extension that imports any webpage into Solveit for reading and annotat
 1. Navigate to any webpage
 2. Click the Solveit Reader extension icon
 3. Configure settings (if needed):
-   - **Instance URL**: Your Solveit instance (e.g., `http://localhost:6001`)
+   - **Instance URL**: Your Solveit instance
    - **Folder**: Where to save dialogs (default: `readings`)
 4. Click "Import to Solveit"
 
