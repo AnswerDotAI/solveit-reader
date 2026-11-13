@@ -1,5 +1,29 @@
 # Changelog
 
+## [3.0.0] - 2026-10-03
+
+Solveit now stores dialogs through RustyGate and no longer has the `/add_relative_` route. Version 2.0 could create a dialog but could not add the page to it.
+
+### Changed
+- The import builds the dialog as a notebook in the browser and sends it to `/upload_file_`, the route Solveit's Upload dialog uses. Tested against Solveit 0.0.117 and RustyGate 0.1.25.
+- The import runs in a background service worker. Closing the popup no longer aborts it.
+- A title that is already taken gets a numbered name (`title-2.ipynb`). Version 2.0 appended to the existing dialog.
+- A 403 from the instance reports "Not signed in to Solveit".
+
+### Removed
+- The `cookies` and `activeTab` permissions and the hand-built `Cookie` header. Requests send the instance cookies through `credentials: 'include'`.
+- `web_accessible_resources`: `chrome.scripting.executeScript` does not need it.
+- The `#ai` suffix on image links. Current Solveit gives it no meaning: web images stay links, and only attachments enter model context.
+
+### Fixed
+- arXiv display equations rendered as raw `<math>` HTML. LaTeXML wraps them in heading-less `<table class="ltx_equation">` elements, which the GFM table plugin keeps verbatim. They now become `$$...$$` blocks, including `align` groups.
+- arXiv data tables arrived as raw HTML, with inline tags such as `<cite>` shown as text. LaTeXML marks header cells with `<td class="ltx_th">`, so the GFM plugin saw no heading row. Tables without a heading row now convert with their first row as the header, and newlines inside cells collapse to spaces.
+- arXiv figures served as `<object type="image/svg+xml">` were dropped, leaving only their captions. They now import as image links.
+
+### Added
+- `tests/test_import.py`: an end-to-end test in headless Chrome through fastcdp, against an isolated Solveit instance.
+
+---
 ## [2.0.0] - 2026-01-14
 
 ### Changed

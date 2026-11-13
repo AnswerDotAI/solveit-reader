@@ -14,17 +14,36 @@ function toMarkdown() {
 
   td.addRule('imgs', {
     filter: 'img',
-    replacement: (c,n) => n.src ? `![${n.alt||''}](${n.src}#ai${n.title ? ` "${n.title}"` : ''})` : ''
+    replacement: (c,n) => n.src ? `![${n.alt||''}](${n.src}${n.title ? ` "${n.title}"` : ''})` : ''
   })
 
+  const tex = n => n.querySelector('annotation[encoding="application/x-tex"]')?.textContent.trim()
   td.addRule('math', {
     filter: 'math',
     replacement: (c,n) => {
-      const a = n.querySelector('annotation[encoding="application/x-tex"]')
-      if (!a) return c
-      const tex = a.textContent.trim()
-      return n.getAttribute('display')==='block' ? `$$${tex}$$` : `\\(${tex}\\)`
+      const t = tex(n)
+      if (!t) return c
+      return n.getAttribute('display')==='block' ? `$$${t}$$` : `\\(${t}\\)`
     }
+  })
+
+  td.addRule('tableCell', {
+    filter: ['th', 'td'],
+    replacement: (c,n) => (n.cellIndex ? ' ' : '| ') + c.replace(/\s*\n\s*/g, ' ').trim() + ' |'
+  })
+
+  const eqnSel = '.ltx_equation, .ltx_equationgroup'
+  td.addRule('headlessTables', {
+    filter: n => n.nodeName==='TABLE' && n.rows.length && !n.tHead && !n.matches(eqnSel) && ![...n.rows[0].cells].every(c => c.nodeName==='TH'),
+    replacement: (c,n) => {
+      const [head, ...body] = c.trim().split('\n')
+      return '\n\n' + [head, '|' + ' --- |'.repeat(n.rows[0].cells.length), ...body].join('\n') + '\n\n'
+    }
+  })
+
+  td.addRule('eqnTables', {
+    filter: n => n.nodeName==='TABLE' && n.matches(eqnSel),
+    replacement: (c,n) => '\n\n' + [...n.querySelectorAll('math')].map(tex).filter(Boolean).map(t => `$$${t}$$`).join('\n\n') + '\n\n'
   })
 
   td.addRule('links', {
@@ -35,6 +54,12 @@ function toMarkdown() {
   const sels = ['article', 'main', '[role="main"]', '.content', '#content', '.post', '.entry', '.post-content', '.article-content', '.article-body']
   const largest = els => els.reduce((a,b) => (b.textContent.length > (a?.textContent.length||0) ? b : a), null)
   const content = largest(sels.flatMap(s => [...document.querySelectorAll(s)])) || document.body
+  const dom = content.cloneNode(true)
+  for (const o of dom.querySelectorAll('object[type^="image/"]')) {
+    const img = document.createElement('img')
+    img.src = o.data
+    o.replaceWith(img)
+  }
 
   const tocSels = ['nav.ltx_TOC', '.toc', '#toc', 'nav[role="doc-toc"]', '.table-of-contents', '#table-of-contents']
   let toc = ''
@@ -44,7 +69,7 @@ function toMarkdown() {
   }
 
   const unesc = s => s.replace(/\\\[/g, '[').replace(/\\\]/g, ']')
-  let md = unesc(td.turndown(content))
+  let md = unesc(td.turndown(dom))
   if (toc) md = unesc(toc) + '\n\n---\n\n' + md
 
   return {title:document.title, url:window.location.href, markdown:md}
