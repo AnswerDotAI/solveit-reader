@@ -12,7 +12,7 @@ from fastcdp import CDP
 EXT = Path(__file__).parent.parent
 CHROME = os.environ.get('FASTCDP_CHROME') or sorted((Path.home()/'.cache/ms-playwright').glob('chromium-*/chrome-linux64/chrome'))[-1]
 
-ARTICLE = r'''<!DOCTYPE html><html><head><title>Why Cats Purr: A Study</title></head><body>
+ARTICLE = r'''<!DOCTYPE html><html><head><meta charset="utf-8"><title>Why Cats Purr: A Study</title></head><body>
 <nav><a href="/">Home</a> <a href="/about">About</a></nav>
 <article>
 <h1>Why Cats Purr</h1>
@@ -24,6 +24,10 @@ ARTICLE = r'''<!DOCTYPE html><html><head><title>Why Cats Purr: A Study</title></
 <figure id="S4.F1" class="ltx_figure"><object type="image/svg+xml" data="/loading.svg" id="S4.F1.g1" class="ltx_graphics" width="476" height="85"></object><figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure">Figure 1: </span>Model loading.</figcaption></figure>
 <table class="ltx_equation ltx_eqn_table" id="S2.Ex1"><tr><td class="ltx_eqn_cell"><math id="S2.Ex1.m1" display="block" alttext="a \oplus b"><semantics><mrow><mi>a</mi></mrow><annotation encoding="application/x-tex">a \oplus b</annotation></semantics></math></td></tr></table>
 <table class="ltx_tabular"><tr><td class="ltx_td ltx_th">Model</td><td class="ltx_td ltx_th">Params</td></tr><tr><td>GPT-4o <cite class="ltx_cite"><a href="#bib1">OpenAI (2024)</a></cite></td><td>&gt;100B</td></tr></table>
+<p>Wikipedia keeps the TeX in data-mw: <math class="mwe-math-element mwe-math-element-inline" data-mw='{"name":"math","attrs":{},"body":{"extsrc":"(0, 1)"}}'><mrow><mo>(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>)</mo></mrow></math> [citation needed].</p>
+<math class="mwe-math-element mwe-math-element-block" display="block" data-mw='{"name":"math","attrs":{"display":"block"},"body":{"extsrc":"\n \\sigma(z)_i = \\frac{e^{z_i}}{\\sum_j e^{z_j}}\n"}}'><mrow><mi>σ</mi></mrow></math>
+<p><math display="block"><semantics><mrow><mi>a</mi></mrow><annotation encoding="application/x-tex">a \\[2pt] b</annotation></semantics></math></p>
+<table class="ltx_tabular"><tr><td class="ltx_th" rowspan="2">Model</td><td class="ltx_th" colspan="2">BLEU</td></tr><tr><td class="ltx_th">EN-DE</td><td class="ltx_th">EN-FR</td></tr><tr><td>Base</td><td>27.3</td><td><math><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">|x|_2 + \|y\|</annotation></semantics></math></td></tr></table>
 </article>
 <footer>Copyright</footer>
 </body></html>'''
@@ -115,13 +119,31 @@ async def test_import(cdp, solveit, article):
     assert '<cite' not in md
     assert 'OpenAI (2024)](' in md
     assert 'About' not in md and 'Copyright' not in md
+    # Wikipedia: TeX from data-mw, inline and display
+    assert r'\((0, 1)\)' in md
+    assert r'$$\sigma(z)_i = \frac{e^{z_i}}{\sum_j e^{z_j}}$$' in md
+    # Brackets: text brackets stay unescaped, TeX brackets keep their backslashes
+    assert '[citation needed]' in md and r'\[citation' not in md
+    assert r'$$a \\[2pt] b$$' in md
+    # Spanned header cells become empty cells, and | inside table maths becomes \vert or \Vert
+    assert '| Model | BLEU |  |\n| --- | --- | --- |\n|  | EN-DE | EN-FR |\n' in md
+    assert r'| Base | 27.3 | \(\vert x\vert _2 + \Vert y\Vert \) |' in md
 
     dlg = await cdp.wait_for_new_page(existing)
     await dlg.wait_for("document.querySelector('#dialog-container')?.textContent.includes('Why Cats Purr')", timeout=30)
     assert 'why-cats-purr-a-study' in await dlg.eval('location.href')
+    # Every formula reaches Solveit as maths, including the one inside the spanned table's cell
+    assert await dlg.eval("document.querySelectorAll('#dialog-container :is(span, div).math').length") == 6
+    assert await dlg.eval("document.querySelectorAll('#dialog-container td .math').length") == 1
+    widths = "[...[...document.querySelectorAll('#dialog-container table')].find(t => t.textContent.includes('EN-DE')).rows].map(r => r.cells.length)"
+    assert await dlg.eval(widths) == [3, 3, 3]
+    assert (root/'readings/CRAFT.css').read_text() == (EXT/'craft/CRAFT.css').read_text()
+    assert await dlg.eval("[...document.querySelectorAll('style')].some(s => s.textContent.includes('Solveit Reader'))")
+    (root/'readings/CRAFT.css').write_text('/* mine */')
 
     r2 = await cdp.eval(run, sid=sid)
     assert r2['name'] == 'readings/why-cats-purr-a-study-2.ipynb'
+    assert (root/'readings/CRAFT.css').read_text() == '/* mine */', 'an existing CRAFT.css must not be overwritten'
 
     await cdp.eval(f'chrome.storage.sync.set({json.dumps(settings)})', sid=sid)
     popup = await cdp.new_page()

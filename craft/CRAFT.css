@@ -1,0 +1,55 @@
+/* Solveit Reader: reader-friendly dialogs.
+   Solveit applies this file to every dialog in this folder and its subfolders. Notes read as one page
+   of text in a centred column; code and prompt messages keep their cards. Edit or delete it freely:
+   the extension only writes it when the folder has none.
+   Solveit loads CRAFT styles before its own, so every rule is nested in `body` to win ties. */
+body {
+  #dialog-container { background: var(--color-background); }
+
+  /* One centred column for every message */
+  #dialog-container > .editable { width: min(100%, 44rem); margin-inline: auto; }
+  #dialog-container .msg-card { width: 100%; }
+
+  /* Notes: page text rather than cards */
+  .editable:has(> .msg-card[data-mtype="note"]) { margin-block: 0; }
+  .msg-card[data-mtype="note"] {
+    position: relative;
+    background: transparent;
+    box-shadow: none;
+    border-color: transparent !important;  /* the coloured left border is an inline style */
+    /* The top band holds the floating message toolbar (26px), so it never covers the text */
+    .msg-body { padding: 1.75rem 0.5rem 0; }
+  }
+
+  /* Note headers float over the top-right corner and show on hover, selection and editing */
+  .msg-card[data-mtype="note"] .uk-card-header {
+    position: absolute; top: 0; right: 0; z-index: 1;
+    border-radius: 0.375rem;
+    background: var(--color-background);
+    opacity: 0;
+    transition: opacity 0.15s;
+    p { display: none; }
+  }
+  .editable:is(:hover, [data-sm="primary"], [data-sm="secondary"], [data-editing], [data-sm-header="collapsed"])
+    > .msg-card[data-mtype="note"] .uk-card-header { opacity: 1; }
+
+  /* Reading typography for notes */
+  .msg-card[data-mtype="note"] .prose {
+    max-width: none;
+    font-family: Charter, "Bitstream Charter", "Iowan Old Style", "Source Serif Pro", Georgia, serif;
+    font-size: 1.125rem;
+    line-height: 1.7;
+    :is(h1, h2, h3, h4) { line-height: 1.25; margin: 1.2em 0 0.3em; }
+    p { margin-block: 0.5em; }
+    > :first-child { margin-top: 0; }
+    > :is(h1, h2, h3, h4):first-child { margin-top: 0.5em; }
+    > :last-child { margin-bottom: 0; }
+    :is(img, svg, figure) { display: block; margin-inline: auto; max-width: 100%; }
+    table { font-family: system-ui, sans-serif; font-size: 0.95rem; }
+    :is(th, td) { border: 1px solid var(--color-border); padding: 0.25em 0.6em; }
+    blockquote { font-style: italic; }
+  }
+
+  /* Prompt replies: easier line spacing */
+  .msg-card[data-mtype="prompt"].card-out .prose { max-width: none; font-size: 1rem; line-height: 1.6; }
+}

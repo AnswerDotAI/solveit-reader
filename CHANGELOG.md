@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- The first import into a folder uploads `craft/CRAFT.css` to it when the folder has no `CRAFT.css`. Solveit applies it to every dialog in the folder: notes read as a serif page column with their buttons shown on hover or selection, while code and prompt messages keep their cards. The extension never overwrites an existing `CRAFT.css` and adds none at the root. Solveit loads CRAFT styles before its own, so the file nests its rules in `body` to win ties.
+
+### Fixed
+- Wikipedia formulas imported as plain text. Wikipedia's MathML has no TeX annotation; the TeX is in each `<math>` element's `data-mw` JSON (`body.extsrc`), which the extension now reads.
+- arXiv tables lost cells, and the maths in them, when a header cell had a `colspan` or `rowspan`. The header row was narrower than the data rows, and GFM drops cells beyond the header's width. Spanned cells now become empty cells, and every row has the table's full width.
+- A `|` inside maths in a table cell split the cell. Maths in a table cell now writes `|` as `\vert` and `\|` as `\Vert`.
+- `\[` and `\]` inside TeX lost their backslashes, as in `a \\[2pt] b`. The extension removed escaped brackets from the whole markdown after conversion. Turndown now leaves `[` and `]` in page text unescaped, and the extension no longer edits the markdown afterwards.
+
 ## [3.0.0] - 2026-10-03
 
 Solveit now stores dialogs through RustyGate and no longer has the `/add_relative_` route. Version 2.0 could create a dialog but could not add the page to it.

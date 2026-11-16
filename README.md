@@ -8,6 +8,7 @@ A Chrome extension that imports the page you are reading into a Solveit dialog a
 - Extracts LaTeX from MathML, as on arXiv and Wikipedia
 - Prepends the page's table of contents when it has one
 - Picks the main article element and drops navigation, footers, cookie banners and similar
+- Adds a reader style (`CRAFT.css`) to the import folder
 
 ## Installation
 
@@ -25,13 +26,16 @@ A Chrome extension that imports the page you are reading into a Solveit dialog a
 
 The extension saves the dialog as `{folder}/{sanitized-page-title}.ipynb`, with a `Source:` note followed by the page content as a note, and opens it in a new tab. If a dialog with that name exists, the new one is numbered: `-2`, `-3`, and so on. You can close the popup while the import runs.
 
+The first import into a folder also adds `CRAFT.css` to it. Solveit applies a folder's `CRAFT.css` to every dialog in that folder and its subfolders, so these dialogs read like a page: notes run as one serif column without card borders, and their buttons appear on hover or selection. Code and prompt messages keep their cards in the same column. The extension never replaces an existing `CRAFT.css`, so you can edit or delete it, and it adds none when the folder is empty (the root), where the style would apply to every dialog.
+
 ## How it works
 
 1. `popup.js` saves the settings and asks the background service worker to import the active tab
 2. `background.js` injects Turndown and `content.js` into the tab and receives the page as markdown
 3. `content.js` finds the main content and converts it to GitHub-flavoured markdown
 4. The worker checks `/static/{name}` to find a free dialog name. It builds a notebook with two markdown cells and POSTs it to `/upload_file_`, the route Solveit's own Upload dialog uses
-5. The worker opens `/dialog_?name={name}` in a new tab
+5. If the folder has no `CRAFT.css` (`/static/{folder}/CRAFT.css` returns 404), the worker uploads `craft/CRAFT.css` there the same way
+6. The worker opens `/dialog_?name={name}` in a new tab
 
 Requests send your Chrome cookies for the instance, so you must be signed in to it. A 403 from the instance reports "Not signed in to Solveit".
 
@@ -42,10 +46,11 @@ solveit-reader/
 ├── manifest.json           # Extension config
 ├── popup.html              # Popup UI
 ├── popup.js                # Settings and the import button
-├── background.js           # Service worker: conversion, naming, upload, open
+├── background.js           # Service worker: conversion, naming, upload, reader style, open
 ├── content.js              # DOM to markdown conversion
 ├── turndown.js             # HTML to markdown library
 ├── turndown-plugin-gfm.js  # GFM tables, strikethrough, task lists
+├── craft/CRAFT.css        # Reader style installed in the import folder
 ├── tests/test_import.py    # Headless browser test
 ├── README.md
 └── CHANGELOG.md
